@@ -1,4 +1,2 @@
 ###### Requirements without Version Specifiers ######`
-os
 openai
-streamlit
