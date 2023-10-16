@@ -3,7 +3,9 @@ import openai
 import streamlit as st
 
 # APIキーを環境変数から読み取らせる
-openai.api_key = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = st.secrets.Openai_apikey.OPENAI_API_KEY
+openai.api_key = OPENAI_API_KEY
+# openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # キャラクターの日本語名と英語名のマッピング
 CHARACTER_MAPPING = {
