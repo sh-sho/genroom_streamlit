@@ -96,7 +96,8 @@ def main():
     # Image create
     st.header("周辺情報")
     # map_image = Image.open("https://github.com/sh-sho/genroom_streamlit/blob/main/image/Akihabara_Station.png")
-    st.image("https://github.com/sh-sho/genroom_streamlit/blob/main/image/Akihabara_Station.png", caption='秋葉原駅周辺地図', )
+    map_image = 'https://github.com/sh-sho/genroom_streamlit/blob/main/image/Akihabara_Station.png'
+    st.image(map_image, caption='秋葉原駅周辺地図', )
 
     spot_name_1 = "公園"
     spot_name_2 = "メイドカフェ"
