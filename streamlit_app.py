@@ -102,7 +102,7 @@ def main():
     spot_name_2 = "メイドカフェ"
     spot_name_3 = "ゲームセンター"
     # ChatGPTによるイメージの考案
-    Design_prompt_jp = (f"{english_name}がいる{spot_name_1}のリアルな風景を{english_name}をいれて考案してください。"
+    Design_prompt_jp = (f"{english_name}がいる{spot_name_1}のリアルな風景を考案してください。"
               "その風景イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
               "単語ベースで、英語で、カンマ区切りで出力してください。")
     Design_prompt_eng = chat_gpt_request(Design_prompt_jp)
@@ -123,7 +123,7 @@ def main():
     st.divider()
 
 # ChatGPTによるイメージの考案
-    Design_prompt_jp = (f"{english_name}がいる{spot_name_2}のリアルな風景を{english_name}をいれて考案してください。"
+    Design_prompt_jp = (f"{english_name}がいる{spot_name_2}のリアルな風景を考案してください。"
               "その風景イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
               "単語ベースで、英語で、カンマ区切りで出力してください。")
     Design_prompt_eng = chat_gpt_request(Design_prompt_jp)
@@ -141,7 +141,7 @@ def main():
     st.divider()
 
 # ChatGPTによるイメージの考案
-    Design_prompt_jp = (f"{english_name}がいる{spot_name_3}のリアルな風景を{english_name}をいれて考案してください。"
+    Design_prompt_jp = (f"{english_name}がいる{spot_name_3}のリアルな風景を考案してください。"
               "その風景イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
               "単語ベースで、英語で、カンマ区切りで出力してください。")
     Design_prompt_eng = chat_gpt_request(Design_prompt_jp)
