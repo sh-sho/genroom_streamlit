@@ -1,6 +1,7 @@
 import os
 import openai
 import streamlit as st
+from PIL import Image
 
 # APIキーを環境変数から読み取らせる
 OPENAI_API_KEY = st.secrets.Openai_apikey.OPENAI_API_KEY
@@ -9,13 +10,13 @@ openai.api_key = OPENAI_API_KEY
 
 # キャラクターの日本語名と英語名のマッピング
 CHARACTER_MAPPING = {
-    'ガンダム': "Mobile Suit Gundam",
-    'ドラえもん': "Doraemon",
-    'セーラームーン': "Sailor Moon",
-    'ナルト': "Naruto Shippuden",
-    'ワンピース': "ONE PIECE",
-    '鬼滅の刃': "Demon Slayer"
+    'リトルグリーンメン': "Little Green Men"
 }
+
+PLACE_MAPPING = {
+    '秋葉原': "Akihabara"
+}
+
 
 def chat_gpt_request(prompt):
     """
@@ -33,6 +34,16 @@ def chat_gpt_request(prompt):
     )
     message = response.choices[0].message['content'].strip()
     return message
+
+# def generate_prompt(english_name, spot_name):
+#     # キャラクター画像の生成文
+#     Design_prompt_jp = (f"{english_name}がいる公園のリアルな風景を{spot_name}をいれて考案してください。"
+#               "その風景イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
+#               "単語ベースで、英語で、カンマ区切りで出力してください。")
+#     Design_prompt_eng = chat_gpt_request(Design_prompt_jp)
+#     summary_prompt = f"Reduce the number of characters in the next sentence to 200 characters.{Design_prompt_eng}"
+#     summary_Design = chat_gpt_request(summary_prompt)
+#     return summary_Design
 
 def generate_image(prompt):
     """
@@ -52,29 +63,99 @@ def display_images(prompt):
     """
     生成された画像を表示します。
     """
-    st.header("部屋の内装イメージ 3パターン")
-    for _ in range(3):
-        st.image(generate_image(prompt), use_column_width=True)
+    st.header("イメージ")
+    for _ in range(1):
+        gen_image = generate_image(prompt)
+        st.image(gen_image, use_column_width=True)
+    return gen_image
+
+# 後から画像を付け足し
+# def edit_image(gen_image):
+#     response = openai.Image.create_edit(
+#         image=gen_image,
+#         mask=open("/image/little-green-men.png"),
+#         size="256x256",
+#     )
+#     edit_image_url = response['data'][0]['url']
+#     return edit_image_url
+
+def generate_story(english_name, spot_name):
+    story_prompt = (f"{english_name}が秋葉原に旅行にいった日記を空想のストーリーで日本語で300文字で生成してください。場所は{spot_name}を巡ってください。")
+    return story_prompt
 
 def main():
-    st.title('推し活で利用したい休憩・宿泊する理想のお部屋は？')
+    st.title('推しのキャラクターストーリーを生成します')
+    # 場所の選択
+    selected_place_Target = st.sidebar.selectbox("好きな場所を選択してください", list(PLACE_MAPPING.keys()))
+    place_name = PLACE_MAPPING.get(selected_place_Target, "Akihabara")
 
+    # キャラクターの選択
     selected_oshi_Target = st.sidebar.selectbox("好きなキャラクターを選択してください", list(CHARACTER_MAPPING.keys()))
-    
-    english_name = CHARACTER_MAPPING.get(selected_oshi_Target, "Mobile Suit Gundam")
+    english_name = CHARACTER_MAPPING.get(selected_oshi_Target, "Little Green Men")
 
-    # ChatGPTによる部屋の内装イメージの考案
-    prompt = (f"{english_name}のファンが住んでいる、間取り：ワンルームの部屋の内装を考案してください。"
-              "その内装イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
+    # Image create
+    st.header("周辺情報")
+    map_image = Image.open('../image/Akihabara_Station.png')
+    st.image(map_image, caption='秋葉原駅周辺地図', )
+
+    spot_name_1 = "公園"
+    spot_name_2 = "メイドカフェ"
+    spot_name_3 = "ゲームセンター"
+    # ChatGPTによるイメージの考案
+    Design_prompt_jp = (f"{english_name}がいる公園のリアルな風景を{spot_name_1}をいれて考案してください。"
+              "その風景イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
               "単語ベースで、英語で、カンマ区切りで出力してください。")
-    roomDesign = chat_gpt_request(prompt)
-    prompt = f"Reduce the number of characters in the next sentence to 200 characters.{roomDesign}"
-    summary_roomDesign = chat_gpt_request(prompt)
-    st.write("考案された部屋の内装デザインのキーワード:", summary_roomDesign)
+    Design_prompt_eng = chat_gpt_request(Design_prompt_jp)
+    summary_prompt = f"Reduce the number of characters in the next sentence to 200 characters.{Design_prompt_eng}"
+    summary_Design = chat_gpt_request(summary_prompt)
+    st.write("考案されたデザインのキーワード:", summary_Design)
 
     # DALL-Eによる画像生成と表示
-    prompt = f"Describe an interior design of {english_name} fun.{summary_roomDesign}"
+    prompt = f"Describe an interior design of {english_name} fun.{summary_Design}"
     display_images(prompt)
+
+
+    st.header("考案されたストーリー")
+    # Story生成
+    story_prompt_1 = generate_story(english_name, spot_name=spot_name_1)
+    st.write(f"ストーリー1「{spot_name_1}」:", chat_gpt_request(story_prompt_1))
+
+    st.divider()
+
+# ChatGPTによるイメージの考案
+    Design_prompt_jp = (f"{english_name}がいるメイドカフェのリアルな風景を{spot_name_2}をいれて考案してください。"
+              "その風景イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
+              "単語ベースで、英語で、カンマ区切りで出力してください。")
+    Design_prompt_eng = chat_gpt_request(Design_prompt_jp)
+    summary_prompt = f"Reduce the number of characters in the next sentence to 200 characters.{Design_prompt_eng}"
+    summary_Design = chat_gpt_request(summary_prompt)
+    st.write("考案されたデザインのキーワード:", summary_Design)
+
+    # DALL-Eによる画像生成と表示
+    prompt = f"Describe an interior design of {english_name} fun.{summary_Design}"
+    display_images(prompt)
+    
+    story_prompt_2 = generate_story(english_name, spot_name=spot_name_2)
+    st.write("考案されたストーリー2「メイドカフェ」:", chat_gpt_request(story_prompt_2))
+
+    st.divider()
+
+# ChatGPTによるイメージの考案
+    Design_prompt_jp = (f"{english_name}がいるメイドカフェのリアルな風景を{spot_name_3}をいれて考案してください。"
+              "その風景イメージが出来上がるようにAIに読み込ませるので、そのイメージを、"
+              "単語ベースで、英語で、カンマ区切りで出力してください。")
+    Design_prompt_eng = chat_gpt_request(Design_prompt_jp)
+    summary_prompt = f"Reduce the number of characters in the next sentence to 200 characters.{Design_prompt_eng}"
+    summary_Design = chat_gpt_request(summary_prompt)
+    st.write("考案されたデザインのキーワード:", summary_Design)
+
+    # DALL-Eによる画像生成と表示
+    prompt = f"Describe an interior design of {english_name} fun.{summary_Design}"
+    display_images(prompt)
+    
+    story_prompt_3 = generate_story(english_name, spot_name=spot_name_3)
+    st.write("考案されたストーリー3「ショップ」:", chat_gpt_request(story_prompt_3))
 
 if __name__ == "__main__":
     main()
+
